@@ -94,6 +94,7 @@ impl<'a> Iterator for TokenStream<'a> {
                         Some(Token::RIGHTPARENTHESIS(self.line))
                     },
                     '&' => {
+                        self.it.next();
                         if let Some('&') = self.it.clone().next() {
                             self.it.next();
                             Some(Token::AND(self.line))
@@ -103,6 +104,7 @@ impl<'a> Iterator for TokenStream<'a> {
                         }
                     }
                     '|' => {
+                        self.it.next();
                         if let Some('|') = self.it.clone().next() {
                             self.it.next();
                             Some(Token::OR(self.line))
