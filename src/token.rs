@@ -17,7 +17,7 @@ pub enum Token<'a>
     // Literals and identifiers
     ID(&'a str), CHARACTER(char), STRINGVAL(&'a str), NUMERAL(&'a str),
 
-    INVALID
+    UNKNOWN
 }
 
 pub struct TokenStream<'a> {
@@ -95,22 +95,20 @@ impl<'a> Iterator for TokenStream<'a> {
                     },
                     '&' => {
                         self.it.next();
-                        if let Some('&') = self.it.clone().next() {
-                            self.it.next();
+                        if let Some('&') = self.it.next() {
                             Some(Token::AND(self.line))
                         }
                         else {
-                            Some(Token::INVALID)
+                            Some(Token::UNKNOWN)
                         }
                     }
                     '|' => {
                         self.it.next();
-                        if let Some('|') = self.it.clone().next() {
-                            self.it.next();
+                        if let Some('|') = self.it.next() {
                             Some(Token::OR(self.line))
                         }
                         else {
-                            Some(Token::INVALID)
+                            Some(Token::UNKNOWN)
                         }
                     }
                     '<' => {
@@ -146,6 +144,7 @@ impl<'a> Iterator for TokenStream<'a> {
                     '+' => {
                         self.it.next();
                         if let Some('+') = self.it.clone().next() {
+                            self.it.next();
                             Some(Token::PLUSPLUS(self.line))
                         } 
                         else {
@@ -210,12 +209,12 @@ impl<'a> Iterator for TokenStream<'a> {
                         if let Some('\'') = self.it.next() {
                             Some(Token::CHARACTER(temp.expect("Invalid character\n")))
                         } else {
-                            Some(Token::INVALID)
+                            Some(Token::UNKNOWN)
                         }
                     },
                     '"' => {
                        self.it.next();
-                       let mut ret_token: Token = Token::INVALID;
+                       let mut ret_token: Token = Token::UNKNOWN;
                        let str = self.it.as_str();
                        while let Some(ch) = self.it.next() {
                             match ch {
@@ -247,7 +246,7 @@ impl<'a> Iterator for TokenStream<'a> {
 
                         Some(Token::NUMERAL(&str[..str.len() - self.it.as_str().len()]))
                     },
-                    _ => Some(Token::INVALID)
+                    _ => Some(Token::UNKNOWN)
                 }
             }
             None => None,
@@ -264,6 +263,7 @@ mod tests {
         let program = String::from(":");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::COLON(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -271,6 +271,7 @@ mod tests {
         let program = String::from(";");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::SEMICOLON(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -278,6 +279,7 @@ mod tests {
         let program = String::from(",");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::COMMA(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -285,6 +287,7 @@ mod tests {
         let program = String::from("=");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::EQUAL(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -292,6 +295,7 @@ mod tests {
         let program = String::from("==");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::EQUALEQUAL(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -299,6 +303,7 @@ mod tests {
         let program = String::from("[");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::LEFTSQUARE(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -306,6 +311,7 @@ mod tests {
         let program = String::from("]");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::RIGHTSQUARE(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -313,6 +319,7 @@ mod tests {
         let program = String::from("{");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::LEFTBRACE(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -320,6 +327,7 @@ mod tests {
         let program = String::from("}");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::RIGHTBRACE(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -327,6 +335,7 @@ mod tests {
         let program = String::from("(");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::LEFTPARENTHESIS(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -334,6 +343,7 @@ mod tests {
         let program = String::from(")");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::RIGHTPARENTHESIS(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -341,6 +351,7 @@ mod tests {
         let program = String::from("&&");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::AND(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -348,6 +359,7 @@ mod tests {
         let program = String::from("||");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::OR(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -355,6 +367,7 @@ mod tests {
         let program = String::from("<");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::LESSTHAN(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -362,6 +375,7 @@ mod tests {
         let program = String::from("<=");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::LESSOREQUAL(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -369,6 +383,7 @@ mod tests {
         let program = String::from(">");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::GREATERTHAN(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -376,6 +391,7 @@ mod tests {
         let program = String::from(">=");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::GREATEROREQUAL(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -383,6 +399,7 @@ mod tests {
         let program = String::from("!");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::NOT(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -390,6 +407,7 @@ mod tests {
         let program = String::from("!=");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::NOTEQUAL(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -397,6 +415,7 @@ mod tests {
         let program = String::from("+");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::PLUS(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -404,6 +423,7 @@ mod tests {
         let program = String::from("++");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::PLUSPLUS(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -411,6 +431,7 @@ mod tests {
         let program = String::from("-");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::MINUS(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -418,6 +439,7 @@ mod tests {
         let program = String::from("--");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::MINUSMINUS(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -425,6 +447,7 @@ mod tests {
         let program = String::from("*");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::TIMES(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -432,6 +455,7 @@ mod tests {
         let program = String::from("/");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::DIVIDE(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -439,6 +463,7 @@ mod tests {
         let program = String::from(".");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::DOT(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -446,6 +471,7 @@ mod tests {
         let program = String::from("array");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::ARRAY(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -453,6 +479,7 @@ mod tests {
         let program = String::from("boolean");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::BOOLEAN(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -460,6 +487,7 @@ mod tests {
         let program = String::from("break");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::BREAK(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -467,6 +495,7 @@ mod tests {
         let program = String::from("char");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::CHAR(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -474,6 +503,7 @@ mod tests {
         let program = String::from("continue");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::CONTINUE(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -481,6 +511,7 @@ mod tests {
         let program = String::from("do");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::DO(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -488,6 +519,7 @@ mod tests {
         let program = String::from("function");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::FUNCTION(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -495,6 +527,7 @@ mod tests {
         let program = String::from("if");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::IF(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -502,6 +535,7 @@ mod tests {
         let program = String::from("else");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::ELSE(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -509,6 +543,7 @@ mod tests {
         let program = String::from("integer");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::INTEGER(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -516,6 +551,7 @@ mod tests {
         let program = String::from("of");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::OF(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -523,6 +559,7 @@ mod tests {
         let program = String::from("string");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::STRING(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -530,6 +567,7 @@ mod tests {
         let program = String::from("struct");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::STRUCT(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -537,6 +575,7 @@ mod tests {
         let program = String::from("true");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::TRUE(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -544,6 +583,7 @@ mod tests {
         let program = String::from("false");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::FALSE(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -551,6 +591,7 @@ mod tests {
         let program = String::from("type");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::TYPE(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -558,6 +599,7 @@ mod tests {
         let program = String::from("var");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::VAR(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -565,6 +607,7 @@ mod tests {
         let program = String::from("while");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::WHILE(1))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -572,6 +615,7 @@ mod tests {
         let program = String::from("identifier");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::ID("identifier"))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -579,14 +623,15 @@ mod tests {
         let program = String::from("'a'");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::CHARACTER('a'))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
     fn test_stringval(){
-        let program = String::from(r#""Hello World""#);
+        let program = String::from(r#""Hello   World""#);
         let mut t_stream = TokenStream::new(program.chars());
-        println!("{}", program);
         assert_eq!(t_stream.next(), Some(Token::STRINGVAL("Hello World"))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
@@ -594,20 +639,57 @@ mod tests {
         let program = String::from("123.456");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::NUMERAL("123.456"))); 
+        assert_eq!(t_stream.next(), None);
     }
 
     #[test]
-    fn mix_and_next_line() {
-        let program = String::from("struct array if else && ||\ncontinue do");
+    fn test_unknown_from_and(){
+        let program = String::from("&a");
+        let mut t_stream = TokenStream::new(program.chars());
+        assert_eq!(t_stream.next(), Some(Token::UNKNOWN));
+        assert_eq!(t_stream.next(), None);
+    }
+
+    #[test]
+    fn test_unknown_from_or(){
+        let program = String::from("|a");
+        let mut t_stream = TokenStream::new(program.chars());
+        assert_eq!(t_stream.next(), Some(Token::UNKNOWN));
+        assert_eq!(t_stream.next(), None);
+    }
+
+    #[test]
+    fn test_unknown_from_end(){
+        let program = String::from(r#""sdfdsfdsf"#);
+        let mut t_stream = TokenStream::new(program.chars());
+        assert_eq!(t_stream.next(), Some(Token::UNKNOWN));
+        assert_eq!(t_stream.next(), None);
+    }
+
+    #[test]
+    fn test_unknown_from_character(){
+        let program = String::from("'a");
+        let mut t_stream = TokenStream::new(program.chars());
+        assert_eq!(t_stream.next(), Some(Token::UNKNOWN));
+        assert_eq!(t_stream.next(), None);
+    }
+
+
+    #[test]
+    fn test_mix_and_next_line() {
+        let program = String::from("struct while() array if else && ||\ncontinue \ndo");
         let mut t_stream = TokenStream::new(program.chars());
         assert_eq!(t_stream.next(), Some(Token::STRUCT(1)));
+        assert_eq!(t_stream.next(), Some(Token::WHILE(1)));
+        assert_eq!(t_stream.next(), Some(Token::LEFTPARENTHESIS(1)));
+        assert_eq!(t_stream.next(), Some(Token::RIGHTPARENTHESIS(1)));
         assert_eq!(t_stream.next(), Some(Token::ARRAY(1)));
         assert_eq!(t_stream.next(), Some(Token::IF(1)));
         assert_eq!(t_stream.next(), Some(Token::ELSE(1)));
         assert_eq!(t_stream.next(), Some(Token::AND(1)));
         assert_eq!(t_stream.next(), Some(Token::OR(1)));
         assert_eq!(t_stream.next(), Some(Token::CONTINUE(2)));
-        assert_eq!(t_stream.next(), Some(Token::DO(2)));
+        assert_eq!(t_stream.next(), Some(Token::DO(3)));
         assert_eq!(t_stream.next(), None);
     }
 }
