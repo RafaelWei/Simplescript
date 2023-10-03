@@ -1,10 +1,11 @@
 mod token;
-// mod scanner;
+mod syntatic_analyzer;
+
+#[cfg(test)]
+mod tests; 
 
 use std::env;
 use std::fs;
-// use token::TokenStream;
-// use scanner::Scanner;
 
 fn main() {
     // read command line inputs
