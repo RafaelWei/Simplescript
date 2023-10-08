@@ -1,4 +1,5 @@
-use crate::token::*;
+use crate::syntatic_analyzer::terminals::Token;
+use crate::syntatic_analyzer::token_stream::TokenStream;
 
 #[test]
 fn test_colon(){

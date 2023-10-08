@@ -1,5 +1,4 @@
-mod token;
-mod syntatic_analyzer;
+pub mod syntatic_analyzer;
 
 #[cfg(test)]
 mod tests; 
