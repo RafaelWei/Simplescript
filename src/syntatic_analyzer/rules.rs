@@ -79,6 +79,7 @@ pub enum Rules {
     NUM,
     IDD,
     IDU,
+    ID,
     NB,         // Marcardor semantico new block 
     MF,         // Marcador semantico de funcao
     MC,         // Marcador
@@ -168,13 +169,14 @@ impl From<usize> for Rules {
             74 => Rules::NUM,
             75 => Rules::IDD,
             76 => Rules::IDU,
-            77 => Rules::NB,         
-            78 => Rules::MF,         
-            79 => Rules::MC,         
-            80 => Rules::MT,
-            81 => Rules::ME,
-            82 => Rules::MW,
-            83 => Rules::NF,
+            77 => Rules::ID,
+            78 => Rules::NB,         
+            79 => Rules::MF,         
+            80 => Rules::MC,         
+            81 => Rules::MT,
+            82 => Rules::ME,
+            83 => Rules::MW,
+            84 => Rules::NF,
             _ => Rules::ERROR
         }
     }

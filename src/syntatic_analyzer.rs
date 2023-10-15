@@ -60,7 +60,7 @@ impl StateMachine {
                 _ => ()
             }
 
-            dbg!(&curr_tok);
+            //dbg!(&curr_tok);
             if action > 0 {
                 self.syntatic_stack.push(usize::try_from(action).unwrap());
                 curr_tok = token_stream.next().unwrap();
@@ -75,7 +75,7 @@ impl StateMachine {
 
                 action = -action;
                 reduction_rule = usize::try_from(action-1).unwrap();
-                dbg!(Rules::from(reduction_rule));
+                //dbg!(Rules::from(reduction_rule));
                 self.semantics(Rules::from(reduction_rule));
                 let new_length = self.syntatic_stack.len() - constants::RULELEN[reduction_rule];
                 self.syntatic_stack.truncate(new_length);
@@ -110,7 +110,7 @@ impl StateMachine {
             Rules::IDD => {
                 let idd = nonterminals::AttribToken::IDD(Object(self.token_sec.clone(), nonterminals::Kind::no_kind_def));
                 if let Some(_) = self.scope_analyzer.search(self.token_sec.as_str()) {
-                    dbg!("{:?}", &self.token_sec);
+                    //dbg!("{:?}", &self.token_sec);
                     panic!("IDENTIFIER REDECLARATION");
                 } else {
                     self.scope_analyzer.define(self.token_sec.clone());
@@ -126,6 +126,10 @@ impl StateMachine {
                     //self.scope_analyzer.define(self.token_sec.clone());
                 }
             },
+            Rules::ID => {
+                let obj = Object(self.token_sec.clone(), Kind::no_kind_def);
+                self.semantic_stack.push(nonterminals::AttribToken::IDU(obj));
+            }
             Rules::NF => {
                 self.scope_analyzer.new_block();
                 self.semantic_stack.push(nonterminals::AttribToken::NF);
@@ -753,8 +757,9 @@ impl StateMachine {
                             // we must error out. We can change the struct type to hold a vec of
                             // other types later.
                             let mut found_field = false;
+                            let field_name_target = id_obj.0;
                             for obj in boxed_obj_vec.iter() {
-                                 if id_obj.0 == obj.0 {
+                                 if field_name_target == obj.0 {
                                     if let Kind::field(field_type) = obj.1.clone() {
                                         self.semantic_stack.push(nonterminals::AttribToken::LV(field_type));    
                                         found_field = true;
