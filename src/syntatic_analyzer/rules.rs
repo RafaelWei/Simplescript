@@ -69,9 +69,9 @@ pub enum Rules {
     F_NUM,
     LE_LE,      // Lista de expressoes
     LE_E,       // Lista de expressoes; regra nao recursiva
-    LV_STRUCT,  // Variavel dentro de uma struct     
-    LV_ARR,     // Variavel dentro de um array
-    LV_IDU,     // Variavel comum
+    LV_STRUCT,  // Left value dentro de uma struct     
+    LV_ARR,     // Left value dentro de um array
+    LV_IDU,     // Left value variavel comum
     TRUE,
     FALSE,
     C,

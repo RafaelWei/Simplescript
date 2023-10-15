@@ -17,7 +17,7 @@ fn test_syntax(){
         function funcaoRecursiva(n : int) : integer {
           var p : integer;
           var x : intArray;
-          if (n == 0)
+          if (n == p)
             p = funcaoRecursiva(n-1);
         }
 
@@ -26,7 +26,7 @@ fn test_syntax(){
           var b : int;
           var c : boolean;
           var str : string;
-          var carac1,carac2 : char;
+          var carac1, carac2 : char;
 
           if (a == 0)
             g = funcaoRecursiva(i-1);

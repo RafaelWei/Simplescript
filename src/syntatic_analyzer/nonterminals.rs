@@ -44,38 +44,74 @@ impl Token {
     }
 }
 
-#[derive(Clone)]
-pub struct Object(pub String);
-
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq)]
 pub enum AttribToken {
+    B,
+    CHR(Object, char), 
+    DC,
+    DE,
+    DF,
+    DT,
+    DV,
+    E(Type),
+    F(Type),
+    FALSE(Object, bool),
     IDD(Object),
     IDU(Object),
+    L(Type),
+    LDE,
+    LDV,
+    LE(Vec<Type>, usize),
+    LI(Vec<Object>),
+    LP(Vec<Object>),
+    LS,
+    LV(Type),
+    MC(Type, Vec<Type>),
+    ME,
+    MF,
+    MT,
+    MW,
+    NB,
+    NF,
+    NUM(Object, i32),
+    P,
+    R(Type),
+    S,
+    STR(Object, String),
+    T(Type),
+    TRUE(Object, bool),
+    Y(Type) 
 }
 
-/*
+#[derive(Clone, PartialEq, Eq)]
+pub struct Object(pub String, pub Kind);
+
 #[allow(non_camel_case_types)]
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq)]
 pub enum Kind{
     no_kind_def,
     var(Type),
     param(Type),
     function(Type, Vec<Type>),
     field(Type),
-    array(u32, Type),
-    struct_(Vec<Type>),
+    scalar(Type),
+    array(Type),
+    struct_(Type),
     alias(Type),
     universal
 }
 
+#[derive(Clone, PartialEq, Eq)]
+pub struct StructField(pub String, pub Type);
+
 #[allow(non_camel_case_types)]
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq)]
 pub enum Type {
     Int_,
     Char_,
     Bool_,
     String_,
+    Array_type_(u32, Box<Type>),
     Alias_type_(Box<Type>),
-    Struct_type_(Vec<Box<Type>>)
+    Struct_type_(Box<Vec<Object>>)
 }
-*/
